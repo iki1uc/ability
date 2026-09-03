@@ -2,130 +2,158 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>HH – Host Hub Stargate + Ghost L2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Natur‑Reorg · Nano‑Dashboard</title>
 
 <style>
-body {
-    background:#000;
-    color:#0f0;
-    font-family:Consolas, monospace;
+  body {
+    background:#eef2f5;
+    font-family:-apple-system,Segoe UI,Roboto,sans-serif;
     padding:20px;
-    overflow:hidden;
-}
-
-/* Stargate verstärkt */
-#gate {
-    position:absolute;
-    right:0;
-    top:0;
-    width:50vw;
-    height:100vh;
-    border-left:4px solid #0ff;
-    background:radial-gradient(circle at center, #444, #000);
-    animation:spinGate 12s linear infinite;
-}
-@keyframes spinGate { from {transform:rotate(0deg);} to {transform:rotate(360deg);} }
-
-#vortex {
-    position:absolute;
-    right:0;
-    top:0;
-    width:50vw;
-    height:100vh;
-    background:conic-gradient(from 180deg, #0ff, #000);
-    opacity:0.35;
-    animation:vortexSpin 5s linear infinite;
-}
-@keyframes vortexSpin { from {transform:rotate(0deg);} to {transform:rotate(-360deg);} }
-
-#halo {
-    position:absolute;
-    right:0;
-    top:8vh;
-    width:50vw;
-    height:12vh;
-    background:radial-gradient(circle, rgba(255,255,255,0.5), transparent);
-}
-
-/* Scan Panel sichtbar */
-#scanPanel {
-    position:absolute;
-    left:20px;
-    bottom:20px;
-    width:40vw;
-    background:#111;
-    padding:20px;
-    border:2px solid #333;
+    display:flex;
+    justify-content:center;
+  }
+  .box {
+    width:360px;
+    background:#fff;
+    border:1px solid #d9dde3;
     border-radius:10px;
-    max-height:45vh;
-    overflow:auto;
-}
-
-.module { margin-bottom:10px; font-size:14px; }
-.green { color:#3f3; }
-.red { color:#f33; }
-.yellow { color:#ff0; }
-.cyan { color:#0ff; }
+    padding:20px;
+  }
+  h1 { font-size:18px; margin-bottom:10px; }
+  .row {
+    display:flex;
+    justify-content:space-between;
+    padding:6px 0;
+    border-bottom:1px solid #f0f1f4;
+    font-size:14px;
+  }
+  canvas {
+    width:100%;
+    max-width:320px;
+    background:#fafbfc;
+    border:1px solid #e2e5eb;
+    border-radius:8px;
+    margin:14px 0;
+  }
+  button {
+    background:#1c2230;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:8px 14px;
+    font-size:13px;
+    cursor:pointer;
+    margin-right:6px;
+  }
+  button:hover { background:#333c4f; }
+  .log {
+    height:120px;
+    overflow-y:auto;
+    background:#f9fafb;
+    border:1px solid #e2e5eb;
+    border-radius:8px;
+    padding:10px;
+    font-size:12px;
+    font-family:ui-monospace;
+  }
 </style>
-
-<script>
-// Ghost Level‑2
-window.GHOST = {
-    level: 2,
-
-    scanModule(name, loaded) {
-        return {
-            module: name,
-            loaded,
-            status: loaded ? "OK" : "GHOST‑REPAIR",
-            color: loaded ? "green" : "cyan"
-        };
-    },
-
-    repairMissingModules(modules) {
-        return modules.map(m => this.scanModule(m.name, m.loaded));
-    }
-};
-</script>
-
 </head>
-
 <body>
 
-<h1>HH – Host Hub</h1>
-<p>Stargate + Ghost‑Repair‑Level‑2 aktiv.</p>
+<div class="box">
 
-<div id="gate"></div>
-<div id="vortex"></div>
-<div id="halo"></div>
+  <h1>Natur‑Reorg · CO₂ → O₂ → Atom‑Orbit</h1>
 
-<div id="scanPanel">
-    <h2>Pipeline‑Status</h2>
-    <div id="modules"></div>
+  <div class="row"><span>CO₂‑Level</span><span id="co2">400</span></div>
+  <div class="row"><span>O₂‑Level</span><span id="o2">210</span></div>
+  <div class="row"><span>Reorg‑Status</span><span id="status">Neutral</span></div>
+
+  <canvas id="atomCanvas" width="320" height="320"></canvas>
+
+  <button id="pumpBtn">CO₂‑Pump</button>
+  <button id="reorgBtn">Reorg</button>
+
+  <div class="log" id="logBox">System bereit.</div>
+
 </div>
 
 <script>
-(function () {
+  const NAT = {
+    co2: 400,
+    o2: 210,
+    status: "Neutral",
+    orbit: 0
+  };
 
-    const modules = [
-        { name: "TriAxiom", loaded: false },
-        { name: "RESPO", loaded: false },
-        { name: "AXI", loaded: false },
-        { name: "TEM", loaded: false },
-        { name: "RUN8 Kernel", loaded: false }
-    ];
+  const logs = [];
 
-    const repaired = GHOST.repairMissingModules(modules);
+  function log(msg){
+    const t = new Date().toLocaleTimeString('de-DE');
+    logs.push(`[${t}] ${msg}`);
+    document.getElementById("logBox").innerHTML = logs.slice(-30).join("<br>");
+  }
 
-    const out = repaired.map(m =>
-        `<div class="module ${m.color}">
-            <b>${m.module}:</b> ${m.status}
-        </div>`
-    ).join("");
+  function update(){
+    document.getElementById("co2").textContent = NAT.co2;
+    document.getElementById("o2").textContent = NAT.o2;
+    document.getElementById("status").textContent = NAT.status;
+  }
 
-    document.getElementById("modules").innerHTML = out;
+  function drawAtom(){
+    const c = document.getElementById("atomCanvas");
+    const ctx = c.getContext("2d");
+    const cx = c.width/2, cy = c.height/2;
 
-})();
+    ctx.clearRect(0,0,c.width,c.height);
+
+    // Atomkern
+    ctx.beginPath();
+    ctx.arc(cx,cy,20,0,2*Math.PI);
+    ctx.fillStyle="#1c2230";
+    ctx.fill();
+
+    // Orbit
+    ctx.beginPath();
+    ctx.arc(cx,cy,80,0,2*Math.PI);
+    ctx.strokeStyle="#9aa3b5";
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+    // Elektron
+    const angle = NAT.orbit * 0.1;
+    const ex = cx + Math.cos(angle)*80;
+    const ey = cy + Math.sin(angle)*80;
+
+    ctx.beginPath();
+    ctx.arc(ex,ey,10,0,2*Math.PI);
+    ctx.fillStyle="#4da6ff";
+    ctx.fill();
+  }
+
+  document.getElementById("pumpBtn").onclick = () => {
+    NAT.co2 += 20;
+    NAT.o2 -= 10;
+    NAT.status = "CO₂‑Anstieg";
+    NAT.orbit++;
+    update();
+    drawAtom();
+    log("CO₂‑Pump ausgeführt.");
+  };
+
+  document.getElementById("reorgBtn").onclick = () => {
+    NAT.co2 -= 30;
+    NAT.o2 += 20;
+    NAT.status = "Reorg aktiv";
+    NAT.orbit += 2;
+    update();
+    drawAtom();
+    log("Reorg: CO₂ → O₂ Umwandlung.");
+  };
+
+  update();
+  drawAtom();
+  log("Natur‑Reorg geladen.");
 </script>
 
 </body>
