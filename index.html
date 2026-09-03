@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Axiom-Orbit · Vereinheitlichtes Dashboard</title>
-
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -148,6 +147,10 @@
 </div>
 
 <script>
+  // Eine einzige Quelle der Wahrheit: die Potenzkette 3^1 .. 3^6.
+  // Jeder Orbit-Punkt ist ein (Symbol, Potenzwert)-Paar. Ein Schritt
+  // bewegt den Fokus weiter UND schreibt den zugehörigen Wert in
+  // IQQ-Achse und A81-Status — daher "greift überall, wo es soll".
   const POWERS = [3, 9, 27, 81, 243, 729];
   const SYMBOLS = ["◉", "◎", "◆", "△", "▣", "↺"];
 
@@ -175,6 +178,7 @@
   }
 
   function updateIQQ() {
+    // 9 → 3 → 9 → 3 ... abgeleitet direkt aus dem aktuellen Orbit-Schritt
     const iqqCycle = [9, 3];
     document.getElementById('iqq').textContent = iqqCycle[state.step % 2];
   }
@@ -198,6 +202,7 @@
       return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
     });
 
+    // Verbindungslinien
     ctx.strokeStyle = '#d5d9e0';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -208,6 +213,7 @@
     });
     ctx.stroke();
 
+    // Knoten: Symbol + zugehöriger Potenzwert
     points.forEach((p, i) => {
       const active = i === state.step % count;
       ctx.beginPath();
@@ -239,6 +245,7 @@
 
   document.getElementById('stepBtn').addEventListener('click', () => {
     state.step = (state.step + 1) % SYMBOLS.length;
+    // Der neue Schritt wirkt auf A81: Slots folgen dem Potenzwert am aktuellen Punkt
     state.a81 = POWERS[state.step];
     state.tmp = "Orbit";
     renderAll();
