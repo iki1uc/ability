@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Natur‑Reorg · Nano‑Dashboard</title>
+<title>A81 · Nano‑Ability‑Status</title>
 
 <style>
   body {
@@ -14,7 +14,7 @@
     justify-content:center;
   }
   .box {
-    width:360px;
+    width:380px;
     background:#fff;
     border:1px solid #d9dde3;
     border-radius:10px;
@@ -48,7 +48,7 @@
   }
   button:hover { background:#333c4f; }
   .log {
-    height:120px;
+    height:140px;
     overflow-y:auto;
     background:#f9fafb;
     border:1px solid #e2e5eb;
@@ -63,98 +63,12 @@
 
 <div class="box">
 
-  <h1>Natur‑Reorg · CO₂ → O₂ → Atom‑Orbit</h1>
+  <h1>A81‑Axis · Nano‑Ability</h1>
 
-  <div class="row"><span>CO₂‑Level</span><span id="co2">400</span></div>
-  <div class="row"><span>O₂‑Level</span><span id="o2">210</span></div>
-  <div class="row"><span>Reorg‑Status</span><span id="status">Neutral</span></div>
+  <!-- A81 / 9×9 / QI/IQQ/OCTA -->
+  <div class="row"><span>A81‑Slots</span><span id="a81">81</span></div>
+  <div class="row"><span>9×9‑Engine</span><span id="nine">9</span></div>
+  <div class="row"><span>QI/IQQ/OCTA</span><span id="qiocta">Aktiv</span></div>
 
-  <canvas id="atomCanvas" width="320" height="320"></canvas>
-
-  <button id="pumpBtn">CO₂‑Pump</button>
-  <button id="reorgBtn">Reorg</button>
-
-  <div class="log" id="logBox">System bereit.</div>
-
-</div>
-
-<script>
-  const NAT = {
-    co2: 400,
-    o2: 210,
-    status: "Neutral",
-    orbit: 0
-  };
-
-  const logs = [];
-
-  function log(msg){
-    const t = new Date().toLocaleTimeString('de-DE');
-    logs.push(`[${t}] ${msg}`);
-    document.getElementById("logBox").innerHTML = logs.slice(-30).join("<br>");
-  }
-
-  function update(){
-    document.getElementById("co2").textContent = NAT.co2;
-    document.getElementById("o2").textContent = NAT.o2;
-    document.getElementById("status").textContent = NAT.status;
-  }
-
-  function drawAtom(){
-    const c = document.getElementById("atomCanvas");
-    const ctx = c.getContext("2d");
-    const cx = c.width/2, cy = c.height/2;
-
-    ctx.clearRect(0,0,c.width,c.height);
-
-    // Atomkern
-    ctx.beginPath();
-    ctx.arc(cx,cy,20,0,2*Math.PI);
-    ctx.fillStyle="#1c2230";
-    ctx.fill();
-
-    // Orbit
-    ctx.beginPath();
-    ctx.arc(cx,cy,80,0,2*Math.PI);
-    ctx.strokeStyle="#9aa3b5";
-    ctx.lineWidth=2;
-    ctx.stroke();
-
-    // Elektron
-    const angle = NAT.orbit * 0.1;
-    const ex = cx + Math.cos(angle)*80;
-    const ey = cy + Math.sin(angle)*80;
-
-    ctx.beginPath();
-    ctx.arc(ex,ey,10,0,2*Math.PI);
-    ctx.fillStyle="#4da6ff";
-    ctx.fill();
-  }
-
-  document.getElementById("pumpBtn").onclick = () => {
-    NAT.co2 += 20;
-    NAT.o2 -= 10;
-    NAT.status = "CO₂‑Anstieg";
-    NAT.orbit++;
-    update();
-    drawAtom();
-    log("CO₂‑Pump ausgeführt.");
-  };
-
-  document.getElementById("reorgBtn").onclick = () => {
-    NAT.co2 -= 30;
-    NAT.o2 += 20;
-    NAT.status = "Reorg aktiv";
-    NAT.orbit += 2;
-    update();
-    drawAtom();
-    log("Reorg: CO₂ → O₂ Umwandlung.");
-  };
-
-  update();
-  drawAtom();
-  log("Natur‑Reorg geladen.");
-</script>
-
-</body>
-</html>
+  <!-- 81.build / 81.rom / 81.scan -->
+  <div class="row"><span>81.build</span>
